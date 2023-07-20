@@ -23,11 +23,14 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source $SCRIPT_DIR/lib/common-env.sh
 
 echo "Building container images..."
-
 container_image='eks-workshop-environment'
-
-(cd $SCRIPT_DIR/../lab && $CONTAINER_CLI build -q -t $container_image .)
-
+if [ "$(uname -s)" = "Darwin" ]
+then
+  echo "Running docker build in MAC M1"
+  (cd $SCRIPT_DIR/../lab && $CONTAINER_CLI buildx build -q --platform linux/amd64  -t $container_image .)
+else
+  (cd $SCRIPT_DIR/../lab && $CONTAINER_CLI build -q -t $container_image .)
+fi
 aws_credential_args=""
 
 ASSUME_ROLE=${ASSUME_ROLE:-""}
@@ -39,6 +42,10 @@ if [ ! -z "$ASSUME_ROLE" ]; then
 fi
 
 command_args=""
+
+aws_credential_args="-e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} -e AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}"
+
+echo "Credts ${aws_credential_args}"
 
 echo "Starting shell in container..."
 

@@ -44,6 +44,8 @@ download_and_verify () {
 
 yum install --quiet -y findutils jq tar gzip zsh git diffutils wget tree unzip openssl gettext bash-completion python3 pip3 python3-pip amazon-linux-extras
 
+yum install -y https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm
+
 pip3 install awscurl
 
 # kubectl
@@ -146,7 +148,7 @@ EOT
   cat << EOT > /usr/local/bin/delete-all-if-crd-exists
 #!/bin/bash
 set -e
-curl -fsSL https://raw.githubusercontent.com/${REPOSITORY_OWNER}/${REPOSITORY_NAME}/$REPOSITORY_REF/lab/bin/delete-all-if-crd-exists | bash -s -- \$@
+curl -fsSL https://raw.githubusercontent.com/${REPOSITORY_OWNER}/${REPOSITORY_NAME}/$REPOSITORY_REF/lab/bin/delete-all-if-crd-exists | bash -s -- \$1
 EOT
   chmod +x /usr/local/bin/delete-all-if-crd-exists
   cat << EOT > /usr/local/bin/delete-nodegroup
