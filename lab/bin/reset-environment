@@ -7,6 +7,8 @@ fi
 
 module=$1
 
+echo "Running for cluster ${EKS_CLUSTER_NAME} with module ${module}"
+
 repository_path="/eks-workshop/repository"
 manifests_path="/eks-workshop/manifests"
 base_path="$manifests_path/base-application"

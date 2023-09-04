@@ -17,7 +17,7 @@ Now let us try accessing the 'catalog' database from tbe 'ui' component,
 ```bash wait=30 timeout=240
 $ UI_POD_1=$(kubectl get pod --selector app.kubernetes.io/name=ui -n ui -o json | jq -r '.items[0].metadata.name')
 $ echo $UI_POD_1
-ui-5dfb7d65fc-r7gc5
+ui-XXXX-XXX
 $ kubectl exec -it ${UI_POD_1} -n ui -- curl -v telnet://catalog-mysql.catalog:3306 --connect-timeout 5
  Resolving timed out after 5000 milliseconds
 * Closing connection 0
@@ -48,12 +48,17 @@ Now, we can test to see if we are able to connect to 'catlog' service but not th
 ```bash wait=30 timeout=240
 $ UI_POD_1=$(kubectl get pod --selector app.kubernetes.io/name=ui -n ui -o json | jq -r '.items[0].metadata.name')
 $ echo $UI_POD_1
-ui-5dfb7d65fc-r7gc5
+ui-XXXX-XXX
 $ kubectl exec -it ${UI_POD_1} -n ui -- curl -v telnet://catalog-mysql.catalog:3306 --connect-timeout 5
 *   Trying XXX.XXX.XXX.XXX:3306...
 * ipv4 connect timeout after 4999ms, move on!
 * Failed to connect to catalog-mysql.catalog port 3306 after 5001 ms: Timeout was reached
 * Closing connection 0
+```
+```bash wait=30 timeout=240
+$ UI_POD_1=$(kubectl get pod --selector app.kubernetes.io/name=ui -n ui -o json | jq -r '.items[0].metadata.name')
+$ echo $UI_POD_1
+ui-XXXX-XXX
 $ kubectl exec -it ${UI_POD_1} -n ui -- curl -v catalog.catalog/catalogue --connect-timeout 5
    Trying XXX.XXX.XXX.XXX:80...
 * Connected to catalog.catalog (XXX.XXX.XXX.XXX) port 80 (#0)
@@ -71,7 +76,7 @@ As you could see from the outputs, we can now connect to the 'catalog' service b
 ```bash wait=30 timeout=240
 $ UI_POD_1=$(kubectl get pod --selector app.kubernetes.io/name=ui -n ui -o json | jq -r '.items[0].metadata.name')
 $ echo $UI_POD_1
-ui-5dfb7d65fc-r7gc5
+ui-XXXX-XXXX
 $ kubectl exec -it ${UI_POD_1} -n ui -- curl -v orders.orders/orders --connect-timeout 5
 *   Trying XXX.XXX.XXX.XXX:80...
 * Connected to orders.orders (XXX.XXX.XXX.XXX) port 80 (#0)
@@ -82,10 +87,15 @@ $ kubectl exec -it ${UI_POD_1} -n ui -- curl -v orders.orders/orders --connect-t
 > 
 < HTTP/1.1 200 
 ...
+```
+```bash wait=30 timeout=240
+$ UI_POD_1=$(kubectl get pod --selector app.kubernetes.io/name=ui -n ui -o json | jq -r '.items[0].metadata.name')
+$ echo $UI_POD_1
+ui-XXXX-XXXX
 $ kubectl exec -it ${UI_POD_1} -n ui -- curl -v www.google.com --connect-timeout 5
-   Trying 142.251.211.228:80...
-*   Trying [2607:f8b0:400a:806::2004]:80...
-* Immediate connect fail for 2607:f8b0:400a:806::2004: Network is unreachable
+   Trying XXX.XXX.XXX.XXX:80...
+*   Trying [XXXX:XXXX:XXXX:XXXX::XXXX]:80...
+* Immediate connect fail for XXXX:XXXX:XXXX:XXXX::XXXX: Network is unreachable
 ...
 ```
 Now that we have defined an effective egress policy for 'ui' component, let us focus on the catalog service and database components to implement a network policy to control traffic to the 'catalog' namespace.

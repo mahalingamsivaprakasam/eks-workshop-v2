@@ -4,7 +4,8 @@ set -e
 
 kubectl_version='1.23.9'
 kubectl_checksum='053561f7c68c5a037a69c52234e3cf1f91798854527692acd67091d594b616ce'
-
+#kubectl_version='1.27.4'
+#kubectl_checksum='e761d2a253c2fb2b2ecd506fa54f878e30057000f8b20ec7ef88f6112f3ac845'
 helm_version='3.10.1'
 helm_checksum='c12d2cd638f2d066fec123d0bd7f010f32c643afdf288d39a4610b1f9cb32af3'
 

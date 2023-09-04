@@ -13,7 +13,7 @@ Before applying the policy, the 'catalog' service can be accessed by both the 'u
 ```bash wait=30 timeout=240
 $ UI_POD_1=$(kubectl get pod --selector app.kubernetes.io/name=ui -n ui -o json | jq -r '.items[0].metadata.name')
 $ echo $UI_POD_1
-ui-5dfb7d65fc-r7gc5
+ui-XXXX-XXX
 $ kubectl exec -it ${UI_POD_1} -n ui -- curl -v catalog.catalog/catalogue --connect-timeout 5
    Trying XXX.XXX.XXX.XXX:80...
 * Connected to catalog.catalog (XXX.XXX.XXX.XXX) port 80 (#0)
@@ -28,7 +28,7 @@ $ kubectl exec -it ${UI_POD_1} -n ui -- curl -v catalog.catalog/catalogue --conn
 ```bash wait=30 timeout=240
 $ ORDER_POD_1=$(kubectl get pod --selector app.kubernetes.io/component=service -n orders -o json | jq -r '.items[0].metadata.name')
 $ echo $ORDER_POD_1
-orders-5696b978f5-fbgmq
+orders-XXXX-XXX
 $ kubectl exec -it ${ORDER_POD_1} -n orders -- curl -v catalog.catalog/catalogue --connect-timeout 5
    Trying XXX.XXX.XXX.XXX:80...
 * Connected to catalog.catalog (XXX.XXX.XXX.XXX) port 80 (#0)
@@ -52,7 +52,7 @@ Now, we can validate the policy by checking to see if we can connect to the 'cat
 ```bash wait=30 timeout=240
 $ UI_POD_1=$(kubectl get pod --selector app.kubernetes.io/name=ui -n ui -o json | jq -r '.items[0].metadata.name')
 $ echo $UI_POD_1
-ui-5dfb7d65fc-r7gc5
+ui-XXXX-XXX
 $ kubectl exec -it ${UI_POD_1} -n ui -- curl -v catalog.catalog/catalogue --connect-timeout 5
   Trying XXX.XXX.XXX.XXX:80...
 * Connected to catalog.catalog (XXX.XXX.XXX.XXX) port 80 (#0)
@@ -67,7 +67,7 @@ $ kubectl exec -it ${UI_POD_1} -n ui -- curl -v catalog.catalog/catalogue --conn
 ```bash wait=30 timeout=240
 $ ORDER_POD_1=$(kubectl get pod --selector app.kubernetes.io/component=service -n orders -o json | jq -r '.items[0].metadata.name')
 $ echo $ORDER_POD_1
-orders-5696b978f5-fbgmq
+orders-XXXX-XXX
 $ kubectl exec -it ${ORDER_POD_1} -n orders -- curl -v catalog.catalog/catalogue --connect-timeout 5
 *   Trying XXX.XXX.XXX.XXX:80...
 * ipv4 connect timeout after 4999ms, move on!
@@ -76,7 +76,7 @@ $ kubectl exec -it ${ORDER_POD_1} -n orders -- curl -v catalog.catalog/catalogue
 curl: (28) Failed to connect to catalog.catalog port 80 after 5001 ms: Timeout was reached
 ...
 ```
-As you could see from the above outputs, 'ui' component is able to communicate with the 'catalog' service component but not the orders' service component. 
+As you could see from the above outputs, only the 'ui' component is able to communicate with the 'catalog' service component, and the 'orders' service component is not able to.
 
 But this still leaves the 'catalog' database component open, so let us implement a network policy to ensure only the 'catalog' service component alone can communicate with the 'catalog' database component.
 ```file
@@ -89,7 +89,7 @@ Let us validate the network policy.
 ```bash wait=30 timeout=240
 $ ORDER_POD_1=$(kubectl get pod --selector app.kubernetes.io/component=service -n orders -o json | jq -r '.items[0].metadata.name')
 $ echo $ORDER_POD_1
-orders-5696b978f5-fbgmq
+orders-XXXX-XXX
 $ kubectl exec -it ${ORDER_POD_1} -n orders -- curl -v telnet://catalog-mysql.catalog:3306 --connect-timeout 5
 *   Trying XXX.XXX.XXX.XXX:3306...
 * ipv4 connect timeout after 4999ms, move on!
@@ -102,7 +102,7 @@ command terminated with exit code 28
 ```bash wait=30 timeout=240
 $ CATALOG_POD_1=$(kubectl get pod --selector app.kubernetes.io/component=service -n catalog -o json | jq -r '.items[0].metadata.name')
 $ echo $CATALOG_POD_1
-catalog-857f89d57d-qlhcw
+catalog-XXXX-XXX
 $ kubectl exec -it ${CATALOG_POD_1} -n catalog -- curl -v telnet://catalog-mysql.catalog:3306 --connect-timeout 5
 *   Trying XXX.XXX.XXX.XXX:3306...
 * Connected to catalog-mysql.catalog (XXX.XXX.XXX.XXX) port 3306 (#0)

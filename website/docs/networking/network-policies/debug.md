@@ -43,7 +43,7 @@ $ RUN_COMMAND_ID_1=$(aws ssm send-command --instance-ids $POD_HOST_INSTANCE_1 --
 $ echo $RUN_COMMAND_ID_1
 $ aws ssm list-command-invocations --command-id $RUN_COMMAND_ID_1 --details | jq -r '.CommandInvocations[0].CommandPlugins[0].Output'
 ```
-AAs you could see from the outputs, calls from the 'ui' component have been denied. On further analysis, we can find that in our network policy, in the ingress section, we just have podSelector and no namespaceSelector. As the namespaceSelector is empty, it will default to the namespace of the network policy, which is 'orders'. Hence, the policy would be interpreted as allowing pods matching the label 'app.kubernetes.io/name: ui' from the 'orders' namespace, resulting in traffic from the ui' component being denied.
+As you could see from the outputs, calls from the 'ui' component have been denied. On further analysis, we can find that in our network policy, in the ingress section, we just have podSelector and no namespaceSelector. As the namespaceSelector is empty, it will default to the namespace of the network policy, which is 'orders'. Hence, the policy would be interpreted as allowing pods matching the label 'app.kubernetes.io/name: ui' from the 'orders' namespace, resulting in traffic from the ui' component being denied.
 Let's fix the network policy and try again.
 ```file
 manifests/modules/networking/network-policies/apply-network-policies/allow-order-ingress-success-debug.yaml
@@ -54,7 +54,7 @@ $ kubectl apply -f ~/environment/eks-workshop/modules/networking/network-policie
 ```bash wait=30 timeout=240
 $ UI_POD_1=$(kubectl get pod --selector app.kubernetes.io/name=ui -n ui -o json | jq -r '.items[0].metadata.name')
 $ echo $UI_POD_1
-ui-5dfb7d65fc-r7gc5
+ui-XXXX-XXX
 $ kubectl exec -it ${UI_POD_1} -n ui -- curl -v orders.orders/orders --connect-timeout 5
 *   Trying XXX.XXX.XXX.XXX:80...
 * Connected to orders.orders (172.20.248.36) port 80 (#0)

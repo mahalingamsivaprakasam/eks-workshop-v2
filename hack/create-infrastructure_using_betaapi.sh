@@ -1,6 +1,8 @@
 #!/bin/bash
 
-environment=$1
+betaendpoint=$1
+environment=$2
+
 
 set -Eeuo pipefail
 
@@ -8,6 +10,11 @@ if [ -z "$environment" ]; then
   export EKS_CLUSTER_NAME="eks-workshop"
 else
   export EKS_CLUSTER_NAME="eks-workshop-${environment}"
+fi
+
+if [ -z "$betaendpoint" ]; then
+  echo "Please provide a non empty value for beta endpoint."
+  exit -1
 fi
 
 AWS_REGION=${AWS_REGION:-""}
@@ -56,14 +63,14 @@ else
   echo "EKS IAM role already created: ${EKS_ROLE}"
 fi
 
-CLUSTER_NAME=$(aws eks list-clusters --endpoint https://api.beta.us-west-2.wesley.amazonaws.com | jq -r '. | select( .clusters[] | contains("eks-workshop") ) | .clusters[]')
+CLUSTER_NAME=$(aws eks list-clusters --endpoint ${betaenpoint} | jq -r '. | select( .clusters[] | contains("eks-workshop") ) | .clusters[]')
 
 if [ -z "${CLUSTER_NAME}" ]
 then
   aws eks create-cluster --name ${EKS_CLUSTER_NAME} --kubernetes-version 1.25 --role-arn $EKS_ROLE \
    --resources-vpc-config subnetIds=${PRIVATE_SUBNETS[0]},${PRIVATE_SUBNETS[1]} --region us-west-2 \
-   --endpoint https://api.beta.us-west-2.wesley.amazonaws.com
-  aws eks wait cluster-active --name ${EKS_CLUSTER_NAME} --endpoint https://api.beta.us-west-2.wesley.amazonaws.com
+   --endpoint ${betaenpoint}
+  aws eks wait cluster-active --name ${EKS_CLUSTER_NAME} --endpoint ${betaenpoint}
 else 
   echo "Cluster already created: ${CLUSTER_NAME}"
 fi
@@ -80,11 +87,11 @@ else
   echo "EKS IAM role already created: ${EKS_NG_ROLE}"
 fi
 
-NODEGROUP_NAME=$(aws eks list-nodegroups --cluster-name ${EKS_CLUSTER_NAME} --endpoint https://api.beta.us-west-2.wesley.amazonaws.com | jq -r '. | select( .nodegroups[] | contains("default") ) | .nodegroups[]')
+NODEGROUP_NAME=$(aws eks list-nodegroups --cluster-name ${EKS_CLUSTER_NAME} --endpoint ${betaenpoint} | jq -r '. | select( .nodegroups[] | contains("default") ) | .nodegroups[]')
 if [ -z "${NODEGROUP_NAME}" ]
 then
-  aws eks create-nodegroup --cluster-name ${EKS_CLUSTER_NAME} --nodegroup-name default --subnets ${PRIVATE_SUBNETS[0]} ${PUBLIC_SUBNETS[0]} ${PRIVATE_SUBNETS[1]} ${PUBLIC_SUBNETS[1]}  --node-role ${EKS_NG_ROLE} --endpoint https://api.beta.us-west-2.wesley.amazonaws.com --scaling-config minSize=0,maxSize=10,desiredSize=2
-  aws eks wait nodegroup-active --name ${EKS_CLUSTER_NAME} --nodegroup-name default --endpoint https://api.beta.us-west-2.wesley.amazonaws.com
+  aws eks create-nodegroup --cluster-name ${EKS_CLUSTER_NAME} --nodegroup-name default --subnets ${PRIVATE_SUBNETS[0]} ${PUBLIC_SUBNETS[0]} ${PRIVATE_SUBNETS[1]} ${PUBLIC_SUBNETS[1]}  --node-role ${EKS_NG_ROLE} --endpoint ${betaenpoint} --scaling-config minSize=0,maxSize=10,desiredSize=2
+  aws eks wait nodegroup-active --cluster-name ${EKS_CLUSTER_NAME} --nodegroup-name default --endpoint ${betaenpoint}
 else 
   echo "Nodegroup is already created: ${NODEGROUP_NAME}"
 fi

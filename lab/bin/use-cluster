@@ -34,4 +34,10 @@ EKS_IP_FAMILY=ipv4
 set +a
 EOT
 
-aws eks update-kubeconfig --name $cluster_name > /dev/null
+echo "USEBETA env var is '${USEBETA}'"
+if [ "${USEBETA}" == "true" ]; then
+  echo Using beta endpoint url
+  aws eks update-kubeconfig --name $cluster_name --endpoint ${BETA_URL} > /dev/null
+else
+  aws eks update-kubeconfig --name $cluster_name > /dev/null
+fi

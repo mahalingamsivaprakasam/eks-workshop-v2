@@ -14,7 +14,7 @@ Currently, there are no network policies that are defined, and any component in 
 ```bash wait=30 timeout=240
 $ UI_POD_1=$(kubectl get pod --selector app.kubernetes.io/name=ui -n ui -o json | jq -r '.items[0].metadata.name')
 $ echo $UI_POD_1
-ui-5dfb7d65fc-r7gc5
+ui-XXXX-XXX
 $ kubectl exec -it ${UI_POD_1} -n ui -- curl -v telnet://catalog-mysql.catalog:3306 --connect-timeout 5
 kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl exec [POD] -- [COMMAND] instead.
 *   Trying XXX.XXX.XXX.XXX:3306...
